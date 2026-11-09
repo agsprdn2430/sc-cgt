@@ -1,4 +1,4 @@
--- DRSV | PTHT Main v2 (LibreGrowtopia)
+-- DRsv | PTHT Main v2 (LibreGrowtopia)
 -- Ubah default di tabel Cfg atau lewat window UI. Tidak ada save/load file (io tidak tersedia).
 
 local Cfg = {
@@ -31,7 +31,7 @@ local Cfg = {
   AutoBuyCheats = true,
   AssumeReady   = true,  -- pohon yang sudah ada saat start dianggap siap panen
   GrowTimeSec   = 0,     -- 0 = ambil growtime dari GetItemInfo(SeedID)
-  WebhookPTHT   = false,
+  Webhook   = false,
   WebhookUrl    = "",
   DiscordID     = "0",
 }
@@ -44,12 +44,12 @@ local Mag, Now = {}, 1
 local ScriptRunning, StartRequested = false, false
 local WorldName, Nick = "", "Unknown"
 local Plant, Harvest = false, true
-local Missed, SprayUWS, PTHT = 0, 0, 0
+local Missed, SprayUWS,  = 0, 0, 0
 local RemoteEmpty, PendingLoop, Sukses = true, false, true
 local PauseAfterKick, ReconnectWebhook = false, false
 local CheckTreeHarvest = false
 local CheckLonely = 0
-local LastConsume, StartTime, PTHT_startTime = 0, 0, 0
+local LastConsume, StartTime, _startTime = 0, 0, 0
 local DelayEntering = 8000
 local ghost = true
 local last_col = nil
@@ -556,7 +556,7 @@ function Scanning()
     if ready == 0 then
       Say("`2Harvest selesai! Beralih ke Planting...")
       PTHT = PTHT + 1
-      SendPacket(2, "action|input\n|text|`b[`cEL`#Group`b] `1" .. PTHT .. " `0PTHT Is Done")
+      SendPacket(2, "action|input\n|text|`b[`cDR`#sv`b] `1" .. PTHT .. " `0PTHT Is Done")
       if Cfg.WebhookPTHT then SendInfoPTHT() end
       if PTHT >= Cfg.TotalPTHT then
         Say("`2Target TotalPTHT (" .. Cfg.TotalPTHT .. ") tercapai!")
@@ -745,7 +745,7 @@ function SendInfoPTHT()
     F("<:uws:1471371059818270743> UWS", UWS .. " !"),
     F(":stopwatch: Avg. Time PTHT", FTime(duration)),
   }
-  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRSV PTHT | PTHT LOG",' ..
+  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsv PTHT | PTHT LOG",' ..
     '"fields":[' .. table.concat(fields, ",") .. '],' ..
     '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. ' | ' .. Date("%d/%m/%Y %H:%M:%S") .. '"},' ..
     '"color":' .. math.random(0, 16777215) .. '}]}'
@@ -762,7 +762,7 @@ function dialog(teks)
             "add_textbox|Position PTHT : `60 `0, `6" .. Cfg.PlantY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|DRSV Scripts|\n" ..
+            "add_smalltext|DRsv Scripts|\n" ..
             "add_url_button||Discord|NOFLAGS|https://discord.gg/MNgWJX2d9E|`9DR Server|0|0|\n" ..
             "add_quick_exit|\nend_dialog|ptht_info||OK|"
   pcall(Client.ShowDialog, d)
@@ -917,7 +917,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "DRSV | PTHT Main v2", width = 380, height = 560})
+UI.Window(WIN, {title = "DRsv | PTHT Main v2", width = 380, height = 560})
 
 local function Head(text)
   UI.Separator(nid("sep"), {parent = WIN})
