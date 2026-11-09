@@ -1,39 +1,39 @@
--- DRsv | PTHT Main v2 (LibreGrowtopia)
+-- DRsv | PTHT Main v2 
 -- Ubah default di tabel Cfg atau lewat window UI. Tidak ada save/load file (io tidak tersedia).
 
 local Cfg = {
   SeedID        = 16707,
   BackgroundID  = 3734,
   VerticalPlant = true,
-  PlantY        = 196,
+  PlantY        = 190,
   StartCount    = 0,
   TotalPTHT     = 100,
   DelayPlant    = 100,
   DelayHarvest  = 200,
-  DelayFindPath = 100,
+  DelayFindPath = 130,
   DelayStepPath = 130,
   UseMRAY       = true,
   MirrorPlant   = false,
   UseUWS        = true,
-  DelayUWS      = 10500,
+  DelayUWS      = 10000,
   TakeUWS       = false,
   UseVending    = false,
   VendingX      = 0,
   VendingY      = 0,
   DelayTake     = 1000,
   AutoRespawn   = true,
-  PointX        = 1,
-  PointY        = 196,
-  MissTree      = 1000,
+  PointX        = 0,
+  PointY        = 197,
+  MissTree      = 100,
   ConsumeLucky  = true,
-  Radio         = true,
+  Radio         = false,
   Lonely        = false,
   AutoBuyCheats = true,
   AssumeReady   = true,  -- pohon yang sudah ada saat start dianggap siap panen
   GrowTimeSec   = 0,     -- 0 = ambil growtime dari GetItemInfo(SeedID)
-  Webhook   = false,
-  WebhookUrl    = "",
-  DiscordID     = "0",
+  WebhookPTHT   = true,
+  WebhookUrl    = "https://discord.com/api/webhooks/1532060254970445845/A1-9I43FIVQ-_T6-qRG9QVZU8gRaUAkEE38oXkO4-SRNjUnfOFfFBYxBbMdRfOIoUhkb",
+  DiscordID     = "460068402631933989",
 }
 
 local Defaults = {}
@@ -267,8 +267,6 @@ local function RecalcDerived()
   GrowMs = sec * 1000
 end
 
--- Libre tidak mengekspos tile.extra.progress, jadi kesiapan panen diperkirakan:
--- (1) sudah di-UWS setelah ditanam, atau (2) sudah lewat growtime sejak ditanam.
 local function IsGrown(key)
   local p = PlantedAt[key]
   if not p then return Cfg.AssumeReady end
