@@ -1,4 +1,4 @@
--- DRsv | PTHT Main v2 
+-- DRsv | PTHT Main v2
 -- Ubah default di tabel Cfg atau lewat window UI. Tidak ada save/load file (io tidak tersedia).
 
 local Cfg = {
@@ -44,12 +44,12 @@ local Mag, Now = {}, 1
 local ScriptRunning, StartRequested = false, false
 local WorldName, Nick = "", "Unknown"
 local Plant, Harvest = false, true
-local Missed, SprayUWS,  = 0, 0, 0
+local Missed, SprayUWS, PTHT = 0, 0, 0
 local RemoteEmpty, PendingLoop, Sukses = true, false, true
 local PauseAfterKick, ReconnectWebhook = false, false
 local CheckTreeHarvest = false
 local CheckLonely = 0
-local LastConsume, StartTime, _startTime = 0, 0, 0
+local LastConsume, StartTime, PTHT_startTime = 0, 0, 0
 local DelayEntering = 8000
 local ghost = true
 local last_col = nil
@@ -267,6 +267,8 @@ local function RecalcDerived()
   GrowMs = sec * 1000
 end
 
+-- Libre tidak mengekspos tile.extra.progress, jadi kesiapan panen diperkirakan:
+-- (1) sudah di-UWS setelah ditanam, atau (2) sudah lewat growtime sejak ditanam.
 local function IsGrown(key)
   local p = PlantedAt[key]
   if not p then return Cfg.AssumeReady end
@@ -753,7 +755,7 @@ end
 function dialog(teks)
   local ok, me = pcall(GetLocal)
   local name = ok and me and tostring(me.name or ""):match("%S+") or ""
-  local d = "add_label_with_icon|big|`2PTHT VIP V2|left|16224|\n" ..
+  local d = "add_label_with_icon|big|`2PTHT V2|left|16224|\n" ..
             "add_spacer|small|\n" ..
             "add_textbox|GrowID : " .. name .. "|\n" ..
             "add_textbox|World : `2" .. WorldName .. "|\n" ..
