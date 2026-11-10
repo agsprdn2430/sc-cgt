@@ -846,7 +846,7 @@ function SendInfoPNB()
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
     F("⏱️ Uptime", FTime(os.time() - StartTime)),
   }
-  local payload = '{"embeds":[{"author":{"name":"[ELGroup]PNB CGT Log"},"fields":[' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT Log"},"fields":[' ..
     table.concat(fields, ",") .. '],"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
@@ -861,7 +861,7 @@ function dialog(teks)
             "add_textbox|Position BFG : `6" .. Cfg.pnbX .. " `0, `6" .. Cfg.pnbY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|ELGroup Scripts|\n" ..
+            "add_smalltext|DRsv Scripts|\n" ..
             "add_url_button||`0Discord``|NOFLAGS|https://discord.gg/S5AqffW7dD|Join my server.|0|\n" ..
             "add_quick_exit|\nend_dialog|pnb_info||OK|"
   pcall(Client.ShowDialog, d)
@@ -967,7 +967,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "ELGroup | PNB Main", width = 380, height = 560})
+UI.Window(WIN, {title = "DRsv | PNB Main", width = 380, height = 560})
 
 local function Head(text)
   UI.Separator(nid("sep"), {parent = WIN})
