@@ -840,7 +840,7 @@ function SendInfoPNB()
       DL .. " <a:DLS:1471368227002257490> "),
     F("<:gems:1484087135815598100> Current Gems", Nmek(Gems)),
     F("<:Bgems:1471367283376001127> Gems Drop",
-      Nmek(BGems) .. " <:bgems:1412036304715120791> " .. Nmek(PGems) .. " <:pgems:1484100621614452766> " .. Nmek(IGems) .. " <:gems:1341127516894789666> IGems"),
+      Nmek(BGems) .. " <:bgems:1412036304715120791> " .. Nmek(PGems) .. " <:pgems:1484100621614452766> " .. Nmek(IGems) .. " <:gems:1194831751193825281> "),
     F("<a:cuan:1471372894134079529> Earned",
       Nmek(EarnedBGLTotal) .. " <a:bgls_1:1471368364743065741> " ..
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
