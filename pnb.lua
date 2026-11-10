@@ -846,8 +846,10 @@ function SendInfoPNB()
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
     F("⏱️ Uptime", FTime(os.time() - StartTime)),
   }
-  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT Log"},"fields":[' ..
-    table.concat(fields, ",") .. '],"color":' .. math.random(0, 16777215) .. '}]}'
+  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsv PNB | PNB LOG",' ..
+    '"fields":[' .. table.concat(fields, ",") .. '],' ..
+    '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. ' | ' .. Date("%d/%m/%Y %H:%M:%S") .. '"},' ..
+    '"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
 
