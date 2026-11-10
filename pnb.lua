@@ -854,7 +854,7 @@ end
 function dialog(teks)
   local ok, me = pcall(GetLocal)
   local name = ok and me and tostring(me.name or ""):match("%S+") or ""
-  local d = "add_label_with_icon|big|`cEL`#Group `9PNB `eCGT `6V3|left|16224|\n" ..
+  local d = "add_label_with_icon|big|`cDR`#sv `9PNB `eCGT `6V3|left|16224|\n" ..
             "add_spacer|small|\n" ..
             "add_textbox|GrowID : " .. name .. "|\n" ..
             "add_textbox|World : `2" .. WorldName .. "|\n" ..
