@@ -145,7 +145,7 @@ function GetMag()
   local tiles = {}
   local w = WorldInfo()
   if not w then return tiles end
-  local step = 100
+  local step = 150
   for cy = 0, w.height - 1, step do
     for cx = 0, w.width - 1, step do
       local cw = math.min(step, w.width - cx)
@@ -251,7 +251,7 @@ end
 
 function PrivatePath(x, y)
   if not InWorld() then return end
-  local delay = 100
+  local delay = 150
   local iX, iY = MyPos()
   if not iX then return end
   local function step(dx, dy, n)
