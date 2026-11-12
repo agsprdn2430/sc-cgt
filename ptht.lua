@@ -1,6 +1,3 @@
--- DRsv | PTHT Main v2
--- Ubah default di tabel Cfg atau lewat window UI. Tidak ada save/load file (io tidak tersedia).
-
 local Cfg = {
   SeedID        = 16707,
   BackgroundID  = 3734,
@@ -519,10 +516,10 @@ function Scanning()
         SendPacket(2, "action|dialog_return\ndialog_name|ultraworldspray")
         SprayAt = Script.GetTime()
         if Cfg.AutoRespawn then
-          Sleep(500)
+          Sleep(1000)
           Say("`2AutoRespawn setelah UWS...")
           SendPacket(2, "action|respawn\n")
-          Sleep(2500)
+          Sleep(5000)
           if Cfg.PointX > 0 or Cfg.PointY > 0 then
             MoveAboveAndWait(Cfg.PointX, Cfg.PointY, 5000)
           end
@@ -533,10 +530,10 @@ function Scanning()
       else
         Say("`2Planting selesai! Menunggu pohon (" .. (Cfg.DelayUWS / 1000) .. "s)...")
         if Cfg.AutoRespawn then
-          Sleep(500)
+          Sleep(1000)
           Say("`2AutoRespawn...")
           SendPacket(2, "action|respawn\n")
-          Sleep(2500)
+          Sleep(5000)
           if Cfg.PointX > 0 or Cfg.PointY > 0 then
             MoveAboveAndWait(Cfg.PointX, Cfg.PointY, 5000)
           end
@@ -569,10 +566,10 @@ function Scanning()
       SprayAt = nil
       PlantedAt = {}
       if Cfg.AutoRespawn then
-        Sleep(500)
+        Sleep(1000)
         Say("`2AutoRespawn setelah harvest...")
         SendPacket(2, "action|respawn\n")
-        Sleep(2500)
+        Sleep(5000)
         if Cfg.PointX > 0 or Cfg.PointY > 0 then
           MoveAboveAndWait(Cfg.PointX, Cfg.PointY, 5000)
         end
