@@ -875,6 +875,8 @@ function StartPTHT()
   end
   if Cfg.AutoBuyCheats then
     SendPacket(2, "action|dialog_return\ndialog_name|buycheat\ndialog_name|cheats\nbuttonClicked|1\n")
+    Sleep(200)
+    SendPacket(2, "action|dialog_return\ndialog_name|cheats\ncheck_gems|1\n")
     Sleep(2000)
   end
   AddHook("OnVariant", "ptht_variant", onvariant)
