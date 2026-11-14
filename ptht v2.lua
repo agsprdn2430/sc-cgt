@@ -30,7 +30,7 @@ local Cfg = {
   Radio         = false,
   Lonely        = false,
   AutoBuyCheats = true,
-  AutoGhost     = true,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / )
+  AutoGhost     = false,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / )
   AssumeReady   = false, -- false = seed yang sudah ada DIPERTAHANKAN (hanya isi tile kosong, lalu UWS)
                          -- true  = jika farm sudah penuh saat start, seed yang ada langsung dipanen
   GrowTimeSec   = 0,     -- 0 = ambil growtime dari GetItemInfo(SeedID)
