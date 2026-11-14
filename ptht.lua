@@ -706,7 +706,7 @@ function onvariant(var)
       if Cfg.AutoBuyCheats then
         SendPacket(2, "action|dialog_return\ndialog_name|buycheat\ndialog_name|cheats\nbuttonClicked|1\n")
       end
-    elseif v1:find("Cheater") then
+    elseif v1:find("Cheat Menu") then
       SendPacket(2, "action|dialog_return\ndialog_name|cheats\ncheck_gems|1\ncheck_lonely|" .. CheckLonely .. "\n")
     elseif v1:find("for cheating of type:") then
       if v1:find(Nick, 1, true) then PauseAfterKick = true end
