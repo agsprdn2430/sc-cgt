@@ -649,7 +649,7 @@ function Scanning()
     if ready == 0 then
       Say("`2Harvest selesai! Beralih ke Planting...")
       PTHT = PTHT + 1
-      SendPacket(2, "action|input\n|text|`b[`cEL`#Group`b] `1" .. PTHT .. " `0PTHT Is Done")
+      SendPacket(2, "action|input\n|text|`b[`cDR`#sv`b] `1" .. PTHT .. " `0PTHT Is Done")
       if Cfg.WebhookPTHT then SendInfoPTHT() end
       if PTHT >= Cfg.TotalPTHT then
         Say("`2Target TotalPTHT (" .. Cfg.TotalPTHT .. ") tercapai!")
@@ -835,7 +835,7 @@ function SendInfoPTHT()
     F("<:uws:1471371059818270743> UWS", UWS .. " !"),
     F(":stopwatch: Avg. Time PTHT", FTime(duration)),
   }
-  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> ELGroup PTHT | PTHT LOG",' ..
+  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsv PTHT | PTHT LOG",' ..
     '"fields":[' .. table.concat(fields, ",") .. '],' ..
     '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. ' | ' .. Date("%d/%m/%Y %H:%M:%S") .. '"},' ..
     '"color":' .. math.random(0, 16777215) .. '}]}'
@@ -845,15 +845,15 @@ end
 function dialog(teks)
   local ok, me = pcall(GetLocal)
   local name = ok and me and tostring(me.name or ""):match("%S+") or ""
-  local d = "add_label_with_icon|big|`2PTHT LIBRE V2|left|16224|\n" ..
+  local d = "add_label_with_icon|big|`2PTHT V2|left|16224|\n" ..
             "add_spacer|small|\n" ..
             "add_textbox|GrowID : " .. name .. "|\n" ..
             "add_textbox|World : `2" .. WorldName .. "|\n" ..
             "add_textbox|Position PTHT : `60 `0, `6" .. Cfg.PlantY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|ELGroup Scripts|\n" ..
-            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9ELGroup Community|0|0|\n" ..
+            "add_smalltext|DRsv Scripts|\n" ..
+            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9DR Server|0|0|\n" ..
             "add_quick_exit|\nend_dialog|ptht_info||OK|"
   pcall(Client.ShowDialog, d)
 end
@@ -1014,7 +1014,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "ELGroup | PTHT Main v2", width = 400, height = 640})
+UI.Window(WIN, {title = "DRsv | PTHT Main v2", width = 400, height = 640})
 
 -- judul section
 local function Head(text)
