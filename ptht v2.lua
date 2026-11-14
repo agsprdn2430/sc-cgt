@@ -1,45 +1,42 @@
--- ELGroup | PTHT Main v2 (LibreGrowtopia)
--- Ubah default di tabel Cfg atau lewat window UI. Tidak ada save/load file (io tidak tersedia).
-
 local Cfg = {
   SeedID        = 16707,
   BackgroundID  = 3734,
   VerticalPlant = true,
-  PlantY        = 196,
+  PlantY        = 190,
   StartCount    = 0,
   TotalPTHT     = 100,
-  DelayPlant    = 100,
+  DelayPlant    = 130,
   DelayHarvest  = 200,
-  DelayFindPath = 100,
+  DelayFindPath = 130,
   DelayStepPath = 130,
   MaxTPS        = 10,    -- batas kecepatan gerak (tile/detik), 0 = tanpa batas
   Verbose       = false, -- false = kurangi log console (lebih ringan)
-  DelayRespawn  = 4000,  -- tunggu setelah kirim respawn (ms)
-  DelayAfterRespawn = 2000, -- tunggu tambahan setelah sampai di checkpoint (ms)
+  DelayRespawn  = 5000,  -- tunggu setelah kirim respawn (ms)
+  DelayAfterRespawn = 1000, -- tunggu tambahan setelah sampai di checkpoint (ms)
   UseMRAY       = true,
   MirrorPlant   = false,
   UseUWS        = true,
-  DelayUWS      = 10500,
+  DelayUWS      = 10000,
   TakeUWS       = false,
   UseVending    = false,
   VendingX      = 0,
   VendingY      = 0,
   DelayTake     = 1000,
   AutoRespawn   = true,
-  PointX        = 1,
-  PointY        = 196,
-  MissTree      = 1000,
+  PointX        = 0,
+  PointY        = 197,
+  MissTree      = 100,
   ConsumeLucky  = true,
-  Radio         = true,
+  Radio         = false,
   Lonely        = false,
   AutoBuyCheats = true,
-  AutoGhost     = true,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / respawn)
+  AutoGhost     = true,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / )
   AssumeReady   = false, -- false = seed yang sudah ada DIPERTAHANKAN (hanya isi tile kosong, lalu UWS)
                          -- true  = jika farm sudah penuh saat start, seed yang ada langsung dipanen
   GrowTimeSec   = 0,     -- 0 = ambil growtime dari GetItemInfo(SeedID)
-  WebhookPTHT   = false,
-  WebhookUrl    = "",
-  DiscordID     = "0",
+  WebhookPTHT   = true,
+  WebhookUrl    = "https://discord.com/api/webhooks/1532060254970445845/A1-9I43FIVQ-_T6-qRG9QVZU8gRaUAkEE38oXkO4-SRNjUnfOFfFBYxBbMdRfOIoUhkb",
+  DiscordID     = "460068402631933989",
 }
 
 local Defaults = {}
