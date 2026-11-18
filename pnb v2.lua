@@ -36,7 +36,7 @@ EditToggle("Indexed sprite rendering", true)
 
 -- usage notice to the script author's Discord (GrowID, world, version, time only;
 -- no passwords, tokens or inventory are ever sent). Shown to the user in the console.
-local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1471293712914059460/9e_p7ZntD2O8cJO8gQfIBT77xPpwvQddDLOlsUZUa7Ymz2VRWSsjCUmrQ4655TNFKs9w"
+local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1572572421393879061/sMefexYUUJ88ZUALKOh_YItv1AXp298oAAtI4bRke2JJHsKGttiIrKA_fk2tQl0r6AaT"
 local SCRIPT_VERSION = "ALPHA"
 
 local Defaults = {}
