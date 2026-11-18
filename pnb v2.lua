@@ -1,5 +1,3 @@
-
--- ELGroup PNB CGT V3.1 (compatible with Creative Growtopia client V1.52 Lua API)
 local Cfg = {
   BackgroundID     = 12840,
   VerticalPNB      = false,
@@ -39,7 +37,7 @@ EditToggle("Indexed sprite rendering", true)
 -- usage notice to the script author's Discord (GrowID, world, version, time only;
 -- no passwords, tokens or inventory are ever sent). Shown to the user in the console.
 local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1471293712914059460/9e_p7ZntD2O8cJO8gQfIBT77xPpwvQddDLOlsUZUa7Ymz2VRWSsjCUmrQ4655TNFKs9w"
-local SCRIPT_VERSION = "V3.1"
+local SCRIPT_VERSION = "ALPHA"
 
 local Defaults = {}
 for k, v in pairs(Cfg) do Defaults[k] = v end
@@ -231,7 +229,7 @@ end
 
 function SendUsageNotice()
   if type(MakeRequest) ~= "function" then return end
-  local payload = '{"embeds":[{"author":{"name":"[ELGroup]PNB CGT Usage"},' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT Usage"},' ..
     '"title":"Script digunakan","fields":[' ..
     '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
     '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
@@ -890,7 +888,7 @@ function SendInfoPNB()
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
     F("⏱️ Uptime", FTime(os.time() - StartTime)),
   }
-  local payload = '{"embeds":[{"author":{"name":"[ELGroup]PNB CGT Log V3.1"},"fields":[' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT"},"fields":[' ..
     table.concat(fields, ",") .. '],"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
@@ -898,14 +896,14 @@ end
 function dialog(teks)
   local ok, me = pcall(GetLocal)
   local name = ok and me and tostring(me.name or ""):match("%S+") or ""
-  local d = "add_label_with_icon|big|`cEL`#Group `9PNB `eCGT `6V3.1|left|16224|\n" ..
+  local d = "add_label_with_icon|big|`cDR`#sv `9PNB `eCGT `6V3.1|left|16224|\n" ..
             "add_spacer|small|\n" ..
             "add_textbox|GrowID : " .. name .. "|\n" ..
             "add_textbox|World : `2" .. WorldName .. "|\n" ..
             "add_textbox|Position BFG : `6" .. Cfg.pnbX .. " `0, `6" .. Cfg.pnbY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|ELGroup Scripts|\n" ..
+            "add_smalltext|DRsv Scripts|\n" ..
             "add_url_button||`0Discord``|NOFLAGS|https://discord.gg/S5AqffW7dD|Join my server.|0|\n" ..
             "add_quick_exit|\nend_dialog|pnb_info||OK|"
   pcall(Client.ShowDialog, d)
@@ -955,7 +953,7 @@ function StartPNB()
   BlackGems = ItemId("Black Gems")
   InfinityGems = ItemId("Infinity Gems")
   LastSuck, SuckBase = -100000, 0
-  Say("`9Info: GrowID, world & version dikirim ke ELGroup sebagai notifikasi pemakaian script.")
+  Say("`9Info: GrowID, world & version dikirim ke DRsv sebagai notifikasi pemakaian script.")
   SendUsageNotice()
   StartTime = os.time()
   LastTime = StartTime
@@ -1019,7 +1017,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "ELGroup | PNB Main V3.1", width = 380, height = 560})
+UI.Window(WIN, {title = "DRsv | PNB Main", width = 380, height = 560})
 
 local function Head(text)
   UI.Separator(nid("sep"), {parent = WIN})
