@@ -229,8 +229,8 @@ end
 
 function SendUsageNotice()
   if type(MakeRequest) ~= "function" then return end
-  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT Usage"},' ..
-    '"title":"Script digunakan","fields":[' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsv] PNB CGT Usage"},' ..
+    '"title":"Script Notice","fields":[' ..
     '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
     '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
     '{"name":"Version","value":"' .. SCRIPT_VERSION .. '","inline":true},' ..
