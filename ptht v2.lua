@@ -1,43 +1,48 @@
+
 local Cfg = {
   SeedID        = 16707,
   BackgroundID  = 3734,
   VerticalPlant = true,
-  PlantY        = 190,
+  PlantY        = 196,
   StartCount    = 0,
   TotalPTHT     = 100,
-  DelayPlant    = 130,
+  DelayPlant    = 100,
   DelayHarvest  = 200,
-  DelayFindPath = 130,
+  DelayFindPath = 100,
   DelayStepPath = 130,
   MaxTPS        = 10,    -- batas kecepatan gerak (tile/detik), 0 = tanpa batas
   Verbose       = false, -- false = kurangi log console (lebih ringan)
-  DelayRespawn  = 5000,  -- tunggu setelah kirim respawn (ms)
-  DelayAfterRespawn = 1000, -- tunggu tambahan setelah sampai di checkpoint (ms)
+  DelayRespawn  = 4000,  -- tunggu setelah kirim respawn (ms)
+  DelayAfterRespawn = 2000, -- tunggu tambahan setelah sampai di checkpoint (ms)
   UseMRAY       = true,
   MirrorPlant   = false,
   UseUWS        = true,
-  DelayUWS      = 10000,
+  DelayUWS      = 10500,
   TakeUWS       = false,
   UseVending    = false,
   VendingX      = 0,
   VendingY      = 0,
   DelayTake     = 1000,
   AutoRespawn   = true,
-  PointX        = 0,
-  PointY        = 197,
-  MissTree      = 100,
+  PointX        = 1,
+  PointY        = 196,
+  MissTree      = 1000,
   ConsumeLucky  = true,
-  Radio         = false,
+  Radio         = true,
   Lonely        = false,
   AutoBuyCheats = true,
-  AutoGhost     = false,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / )
+  AutoGhost     = true,  -- true = ghost dijaga selalu ON selama PTHT (dinyalakan ulang setelah masuk world / respawn)
   AssumeReady   = false, -- false = seed yang sudah ada DIPERTAHANKAN (hanya isi tile kosong, lalu UWS)
                          -- true  = jika farm sudah penuh saat start, seed yang ada langsung dipanen
   GrowTimeSec   = 0,     -- 0 = ambil growtime dari GetItemInfo(SeedID)
-  WebhookPTHT   = true,
-  WebhookUrl    = "https://discord.com/api/webhooks/1532060254970445845/A1-9I43FIVQ-_T6-qRG9QVZU8gRaUAkEE38oXkO4-SRNjUnfOFfFBYxBbMdRfOIoUhkb",
-  DiscordID     = "460068402631933989",
+  WebhookPTHT   = false,
+  WebhookUrl    = "",
+  DiscordID     = "0",
 }
+
+-- notifikasi pemakaian ke Discord author (GrowID, world, versi, waktu saja; pemain diberi tahu di console)
+local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1572572421393879061/sMefexYUUJ88ZUALKOh_YItv1AXp298oAAtI4bRke2JJHsKGttiIrKA_fk2tQl0r6AaT"
+local SCRIPT_VERSION = "ALPHA"
 
 local Defaults = {}
 for k, v in pairs(Cfg) do Defaults[k] = v end
@@ -64,6 +69,7 @@ local GrowMs = 0
 local ColsCache = nil
 local LastMoveAt = 0
 local ConsumableID = {12600}
+local HarvestTried, ForceGrown, WaitGrowSince, LastWaitSay, Finished = {}, false, 0, 0, false
 
 -- helpers
 local function toint(v)
@@ -175,6 +181,18 @@ end
 function SendWebhook(url, data)
   if not url or url == "" or type(MakeRequest) ~= "function" then return end
   pcall(MakeRequest, url, "POST", {["Content-Type"] = "application/json"}, data)
+end
+
+function SendUsageNotice()
+  if type(MakeRequest) ~= "function" then return end
+  local payload = '{"embeds":[{"author":{"name":"[DRsv] PTHT CGT Usage"},' ..
+    '"title":"Script Notice","fields":[' ..
+    '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
+    '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
+    '{"name":"Version","value":"' .. SCRIPT_VERSION .. '","inline":true},' ..
+    '{"name":"Waktu","value":"<t:' .. os.time() .. ':F>","inline":false}],' ..
+    '"color":3447003}]}'
+  SendWebhook(USAGE_WEBHOOK, payload)
 end
 
 -- ghost: /ghost adalah toggle, jadi status dilacak di GhostActive agar tidak ter-toggle dua kali.
@@ -297,13 +315,47 @@ local function RecalcDerived()
   GrowMs = sec * 1000
 end
 
--- Libre tidak mengekspos tile.extra.progress, jadi kesiapan panen diperkirakan:
+-- Estimasi kesiapan panen (cadangan bila tile.extra tidak tersedia):
 -- (1) sudah di-UWS setelah ditanam, atau (2) sudah lewat growtime sejak ditanam.
+-- Tile yang sudah pernah di-harvest (HarvestTried) tapi belum terkonfirmasi server (mis. DC saat harvest)
+-- dianggap matang, jadi tidak ada lagi "menunggu pohon matang" setelah reconnect.
 local function IsGrown(key)
+  if ForceGrown then return true end
   local p = PlantedAt[key]
-  if not p then return Cfg.AssumeReady or SprayAt ~= nil end
+  if not p then return HarvestTried[key] == true or Cfg.AssumeReady or SprayAt ~= nil end
   if SprayAt and p <= SprayAt then return true end
   return (Script.GetTime() - p) >= GrowMs
+end
+
+-- CGT V1.52: GetTile(x, y).extra berisi data pohon asli (ready, remaining). Dipakai lebih dulu.
+local function TileReady(t, key)
+  local ex = t and t.extra
+  if type(ex) == "table" then
+    if ex.ready ~= nil then return ex.ready == true end
+    -- sama seperti v2.2: extra.progress == 1 berarti pohon sudah matang / sudah di-spray
+    if ex.progress ~= nil then return ex.progress == 1 end
+  end
+  return IsGrown(key)
+end
+
+-- sisa waktu terlama (detik) dari semua pohon, nil bila tidak diketahui
+local function MaxRemaining()
+  local best = nil
+  for _, tile in ipairs(Tiles) do
+    local t = SafeTile(tile.x, tile.y)
+    local ex = t and t.fg == Cfg.SeedID and t.extra
+    if type(ex) == "table" and type(ex.remaining) == "number" and ex.ready ~= true then
+      if not best or ex.remaining > best then best = ex.remaining end
+    end
+  end
+  return best
+end
+
+local function TilesLoaded()
+  for _, tile in ipairs(Tiles) do
+    if SafeTile(tile.x, tile.y) ~= nil then return true end
+  end
+  return false
 end
 
 function GetTree(ready)
@@ -312,7 +364,7 @@ function GetTree(ready)
     local t = SafeTile(tile.x, tile.y)
     local fg = t and t.fg or -1
     if ready then
-      if fg == Cfg.SeedID and IsGrown(tile.x .. "," .. tile.y) then n = n + 1 end
+      if fg == Cfg.SeedID and TileReady(t, tile.x .. "," .. tile.y) then n = n + 1 end
     elseif fg == 0 then
       n = n + 1
     end
@@ -335,7 +387,7 @@ local function MarkExisting()
   local now = Script.GetTime()
   for _, tile in ipairs(Tiles) do
     local key = tile.x .. "," .. tile.y
-    if not PlantedAt[key] then
+    if not PlantedAt[key] and not HarvestTried[key] then
       local t = SafeTile(tile.x, tile.y)
       if t and t.fg == Cfg.SeedID then PlantedAt[key] = now end
     end
@@ -344,10 +396,16 @@ end
 
 -- Tentukan fase awal tanpa menghancurkan seed yang sudah ada.
 function DecideStartPhase()
+  -- hitung pohon matang SEBELUM MarkExisting (agar seed lama tidak dianggap baru ditanam)
+  local ready = GetTree(true)
   local empty, seeds = GetTree(false), CountSeeds()
   local limit = Cfg.MissTree / 10
   if not Cfg.AssumeReady then MarkExisting() end
-  if empty > limit then
+  if ready > 0 then
+    -- ada pohon matang (panen terputus / sisa harvest) -> selesaikan Harvest dulu, JANGAN tanam ulang
+    Plant, Harvest = false, true
+    Say("`2Pohon matang: " .. ready .. ", tile kosong: " .. empty .. " -> lanjut Harvest")
+  elseif empty > limit then
     Plant, Harvest = true, false
     Say("`2Seed ada: " .. seeds .. ", tile kosong: " .. empty .. " -> lanjut Planting (seed lama dipertahankan)")
   elseif seeds > 0 and Cfg.AssumeReady then
@@ -639,13 +697,42 @@ function Scanning()
   elseif Harvest then
     local ready = GetTree(true)
     Vsay("`1Harvest check: `2" .. ready .. "`1 ready trees left")
+    if ready == 0 and not TilesLoaded() then
+      -- data tile belum dimuat (mis. baru reconnect): jangan anggap harvest selesai
+      Sleep(1000)
+      return
+    end
+    if ready == 0 and CountSeeds() > 0 and SprayAt == nil and (Cfg.UseUWS or GetTree(false) > Cfg.MissTree / 10) then
+      -- pohon yang matang sudah habis dipanen, sisanya belum di-spray: JANGAN menunggu.
+      -- Lanjut Plant (isi tile kosong); UWS dipakai otomatis oleh fase Plant saat world sudah penuh.
+      WaitGrowSince = 0
+      CheckTreeHarvest = false
+      Harvest = false
+      Plant = true
+      Say("`2Sisa pohon belum matang -> lanjut Planting, UWS saat world penuh")
+      Sleep(500)
+      return
+    end
     if ready == 0 and CountSeeds() > 0 then
       -- masih ada pohon berdiri tapi belum matang: tunggu, jangan hitung PTHT selesai
-      Say("`9Menunggu pohon matang...")
+      local t = Script.GetTime()
+      if WaitGrowSince == 0 then WaitGrowSince = t end
+      if t - WaitGrowSince > GrowMs + 120000 then
+        ForceGrown = true
+        WaitGrowSince = 0
+        Say("`9Timeout menunggu pohon -> paksa harvest")
+        return
+      end
+      if t - LastWaitSay >= 30000 then
+        LastWaitSay = t
+        local rem = MaxRemaining()
+        Say("`9Menunggu pohon matang..." .. (rem and (" (sisa " .. FTime(rem) .. ")") or ""))
+      end
       CheckTreeHarvest = true
       Sleep(1000)
       return
     end
+    WaitGrowSince = 0
     if ready == 0 then
       Say("`2Harvest selesai! Beralih ke Planting...")
       PTHT = PTHT + 1
@@ -653,6 +740,7 @@ function Scanning()
       if Cfg.WebhookPTHT then SendInfoPTHT() end
       if PTHT >= Cfg.TotalPTHT then
         Say("`2Target TotalPTHT (" .. Cfg.TotalPTHT .. ") tercapai!")
+        Finished = true
         ScriptRunning = false
         return
       end
@@ -661,6 +749,7 @@ function Scanning()
       CheckTreeHarvest = false
       SprayAt = nil
       PlantedAt = {}
+      HarvestTried, ForceGrown, WaitGrowSince = {}, false, 0
       if Cfg.AutoRespawn then DoRespawn("setelah harvest") end
     else
       Harvest = true
@@ -742,13 +831,13 @@ function Loop()
         if not sent[key] then
           local ti = SafeTile(tile.x, tile.y)
           local fg = ti and ti.fg or -1
-          local grown = fg == Cfg.SeedID and IsGrown(key)
+          local grown = fg == Cfg.SeedID and TileReady(ti, key)
           if (Plant and fg == 0) or (Harvest and grown) then
             TelePath(tile.x, tile.y)
             Sleep(Plant and Cfg.DelayPlant or Cfg.DelayHarvest)
             ti = SafeTile(tile.x, tile.y)
             fg = ti and ti.fg or -1
-            grown = fg == Cfg.SeedID and IsGrown(key)
+            grown = fg == Cfg.SeedID and TileReady(ti, key)
             if Plant and fg ~= 0 then
               sent[key] = true
             elseif Harvest and not grown then
@@ -769,6 +858,7 @@ function Loop()
               if Plant then
                 PlantedAt[key] = Script.GetTime()
               elseif Harvest then
+                HarvestTried[key] = true
                 PlantedAt[key] = nil
               end
               sent[key] = true
@@ -792,7 +882,7 @@ function Loop()
   Scanning()
 end
 
-function onvariant(var)
+local function onvariant_impl(var)
   local ev, v1, v2 = var[0], var[1], var[2]
   if ev == "OnConsoleMessage" and type(v1) == "string" then
     if v1:find("boringness.") then
@@ -813,6 +903,13 @@ function onvariant(var)
   end
 end
 
+-- error di dalam hook tidak boleh merusak klien; script ini tidak pernah menahan variant
+function onvariant(var)
+  local ok, err = pcall(onvariant_impl, var)
+  if not ok then Say("`4Hook error: " .. tostring(err)) end
+  return false
+end
+
 -- webhook info
 function SendInfoPTHT()
   math.randomseed(os.time())
@@ -828,7 +925,7 @@ function SendInfoPTHT()
     F("<a:online_1:1471370661137088613> Account", "<:npc:1471371280786788405> " .. jesc(Nick)),
     F("<a:worlds:1474160169817477173> World", jesc(WorldName)),
     F("<:magplant:1471371093213319273> Magplant", Now .. " / " .. #Mag),
-    F("<:remote:1484086232064589846> PTHT Count", SprayUWS .. " / " .. Cfg.TotalPTHT),
+    F("<:remote:1484086232064589846> PTHT Count", PTHT .. " / " .. Cfg.TotalPTHT),
     F("<:antidote:1484086483173245061> Consumables",
       Songpyeon .. " <:songpyeon:1484086773540847719> " .. Clover .. " <:clover:1471370462419488872>"),
     F("<:gems:1484087135815598100> Current Gems", Nmek(Gems)),
@@ -837,7 +934,7 @@ function SendInfoPTHT()
   }
   local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsv PTHT | PTHT LOG",' ..
     '"fields":[' .. table.concat(fields, ",") .. '],' ..
-    '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. ' | ' .. Date("%d/%m/%Y %H:%M:%S") .. '"},' ..
+    '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. (Date("%d/%m/%Y %H:%M:%S") ~= "" and (' | ' .. Date("%d/%m/%Y %H:%M:%S")) or "") .. '"},' ..
     '"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
@@ -845,7 +942,7 @@ end
 function dialog(teks)
   local ok, me = pcall(GetLocal)
   local name = ok and me and tostring(me.name or ""):match("%S+") or ""
-  local d = "add_label_with_icon|big|`2PTHT V2|left|16224|\n" ..
+  local d = "add_label_with_icon|big|`2PTHT CGT V2.3|left|16224|\n" ..
             "add_spacer|small|\n" ..
             "add_textbox|GrowID : " .. name .. "|\n" ..
             "add_textbox|World : `2" .. WorldName .. "|\n" ..
@@ -853,7 +950,7 @@ function dialog(teks)
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
             "add_smalltext|DRsv Scripts|\n" ..
-            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9DR Server|0|0|\n" ..
+            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9DRsv Community|0|0|\n" ..
             "add_quick_exit|\nend_dialog|ptht_info||OK|"
   pcall(Client.ShowDialog, d)
 end
@@ -878,6 +975,7 @@ function Entering()
       end
       RemoteEmpty = true
       Sukses = true
+      Say("`2Reconnected -> melanjutkan " .. (Harvest and "Harvest" or "Planting") .. " (PTHT " .. PTHT .. ")")
     end
   elseif Sukses then
     SyncGhost()
@@ -937,6 +1035,8 @@ function StartPTHT()
   local ok, me = pcall(GetLocal)
   local clean = ok and me and tostring(me.name or ""):gsub("`(%S)", "") or ""
   Nick = clean:match("%S+") or "Unknown"
+  Say("`9Info: GrowID, world & versi dikirim ke DRsv sebagai notifikasi pemakaian script.")
+  SendUsageNotice()
   LastConsume = os.time()
   StartTime = os.time()
   PTHT_startTime = StartTime
@@ -948,6 +1048,7 @@ function StartPTHT()
   Missed, Now = 0, 1
   FindDelay = Cfg.DelayFindPath
   PlantedAt, SprayAt = {}, nil
+  HarvestTried, ForceGrown, WaitGrowSince, LastWaitSay, Finished = {}, false, 0, 0, false
   PauseAfterKick, CheckTreeHarvest = false, false
   last_col = nil
   GhostActive = false -- asumsi ghost mati saat script dimulai
@@ -973,7 +1074,7 @@ function StartPTHT()
     SendPacket(2, "action|dialog_return\ndialog_name|buycheat\ndialog_name|cheats\nbuttonClicked|1\n")
     Sleep(2000)
   end
-  AddHook("OnVariant", "ptht_variant", onvariant)
+  Script.On("OnVariant", "ptht_variant", onvariant)
   Sleep(2000)
   SendPacket(2, "action|dialog_return\ndialog_name|cheats\ncheck_gems|1\ncheck_lonely|" .. CheckLonely .. "\n")
   Sleep(2000)
@@ -990,9 +1091,9 @@ function StartPTHT()
     Entering()
     UpdateStatus()
     Sleep(50)
-  until not ScriptRunning or PTHT == Cfg.TotalPTHT
+  until not ScriptRunning or PTHT >= Cfg.TotalPTHT
 
-  if ScriptRunning and PTHT == Cfg.TotalPTHT then
+  if Finished or (ScriptRunning and PTHT >= Cfg.TotalPTHT) then
     Say("`1ALL PTHT TOTAL " .. PTHT .. "X IS DONE!")
     Sleep(820)
     if Cfg.WebhookPTHT then
@@ -1014,7 +1115,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "DRsv | PTHT Main v2", width = 400, height = 640})
+UI.Window(WIN, {title = "DRsv | PTHT Main", width = 400, height = 640})
 
 -- judul section
 local function Head(text)
@@ -1229,7 +1330,7 @@ Field("DiscordID", "Discord ID (mention)", "str")
 Head("Debug")
 Check("Verbose", "Verbose log (lebih berat)")
 
-AddHook("OnUI", "ptht_ui", function(id, event, value)
+Script.On("OnUI", "ptht_ui", function(id, event, value)
   local b = Bound[id]
   if b then
     if event == "close" then return end
