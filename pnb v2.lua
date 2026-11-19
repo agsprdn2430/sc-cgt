@@ -229,7 +229,7 @@ end
 
 function SendUsageNotice()
   if type(MakeRequest) ~= "function" then return end
-  local payload = '{"embeds":[{"author":{"name":"[DRsv] PNB CGT Usage"},' ..
+  local payload = '{"embeds":[{"author":{"name":"[] PNB CGT Usage"},' ..
     '"title":"Script Notice","fields":[' ..
     '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
     '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
@@ -888,7 +888,7 @@ function SendInfoPNB()
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
     F("⏱️ Uptime", FTime(os.time() - StartTime)),
   }
-  local payload = '{"embeds":[{"author":{"name":"[DRsv]PNB CGT"},"fields":[' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsv] PNB CGT"},"fields":[' ..
     table.concat(fields, ",") .. '],"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
