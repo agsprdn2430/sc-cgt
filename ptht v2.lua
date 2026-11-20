@@ -1,4 +1,3 @@
-
 local Cfg = {
   SeedID        = 16707,
   BackgroundID  = 3734,
@@ -185,7 +184,7 @@ end
 
 function SendUsageNotice()
   if type(MakeRequest) ~= "function" then return end
-  local payload = '{"embeds":[{"author":{"name":"[DRsv] PTHT CGT Usage"},' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsc] PTHT CGT Usage"},' ..
     '"title":"Script Notice","fields":[' ..
     '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
     '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
@@ -932,7 +931,7 @@ function SendInfoPTHT()
     F("<:uws:1471371059818270743> UWS", UWS .. " !"),
     F(":stopwatch: Avg. Time PTHT", FTime(duration)),
   }
-  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsv PTHT | PTHT LOG",' ..
+  local payload = '{"embeds":[{"title":"<a:Tealz_verify:1471371847860883479> DRsc PTHT | PTHT LOG",' ..
     '"fields":[' .. table.concat(fields, ",") .. '],' ..
     '"footer":{"text":"Uptime : ' .. FTime(os.time() - StartTime) .. (Date("%d/%m/%Y %H:%M:%S") ~= "" and (' | ' .. Date("%d/%m/%Y %H:%M:%S")) or "") .. '"},' ..
     '"color":' .. math.random(0, 16777215) .. '}]}'
@@ -949,8 +948,8 @@ function dialog(teks)
             "add_textbox|Position PTHT : `60 `0, `6" .. Cfg.PlantY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|DRsv Scripts|\n" ..
-            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9DRsv Community|0|0|\n" ..
+            "add_smalltext|DRsc Scripts|\n" ..
+            "add_url_button||Discord|NOFLAGS|https://discord.gg/S5AqffW7dD|`9DRsc Community|0|0|\n" ..
             "add_quick_exit|\nend_dialog|ptht_info||OK|"
   pcall(Client.ShowDialog, d)
 end
@@ -1035,7 +1034,7 @@ function StartPTHT()
   local ok, me = pcall(GetLocal)
   local clean = ok and me and tostring(me.name or ""):gsub("`(%S)", "") or ""
   Nick = clean:match("%S+") or "Unknown"
-  Say("`9Info: GrowID, world & versi dikirim ke DRsv sebagai notifikasi pemakaian script.")
+  Say("`9Info: GrowID, world & versi dikirim ke DRsc sebagai notifikasi pemakaian script.")
   SendUsageNotice()
   LastConsume = os.time()
   StartTime = os.time()
@@ -1115,7 +1114,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "DRsv | PTHT Main", width = 400, height = 640})
+UI.Window(WIN, {title = "DRsc | PTHT Main", width = 400, height = 640})
 
 -- judul section
 local function Head(text)
