@@ -229,7 +229,7 @@ end
 
 function SendUsageNotice()
   if type(MakeRequest) ~= "function" then return end
-  local payload = '{"embeds":[{"author":{"name":"[] PNB CGT Usage"},' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsc] PNB CGT Usage"},' ..
     '"title":"Script Notice","fields":[' ..
     '{"name":"GrowID","value":"' .. jesc(Nick) .. '","inline":true},' ..
     '{"name":"World","value":"' .. jesc(WorldName) .. '","inline":true},' ..
@@ -888,7 +888,7 @@ function SendInfoPNB()
       Nmek(EarnedDLTotal) .. " <a:DLS:1471368227002257490> "),
     F("⏱️ Uptime", FTime(os.time() - StartTime)),
   }
-  local payload = '{"embeds":[{"author":{"name":"[DRsv] PNB CGT"},"fields":[' ..
+  local payload = '{"embeds":[{"author":{"name":"[DRsc] PNB CGT"},"fields":[' ..
     table.concat(fields, ",") .. '],"color":' .. math.random(0, 16777215) .. '}]}'
   SendWebhook(Cfg.WebhookUrl, payload)
 end
@@ -903,7 +903,7 @@ function dialog(teks)
             "add_textbox|Position BFG : `6" .. Cfg.pnbX .. " `0, `6" .. Cfg.pnbY .. "|\n" ..
             "add_textbox|`8" .. teks .. "|\n" ..
             "add_spacer|small|\n" ..
-            "add_smalltext|DRsv Scripts|\n" ..
+            "add_smalltext|DRsc Scripts|\n" ..
             "add_url_button||`0Discord``|NOFLAGS|https://discord.gg/S5AqffW7dD|Join my server.|0|\n" ..
             "add_quick_exit|\nend_dialog|pnb_info||OK|"
   pcall(Client.ShowDialog, d)
@@ -953,7 +953,7 @@ function StartPNB()
   BlackGems = ItemId("Black Gems")
   InfinityGems = ItemId("Infinity Gems")
   LastSuck, SuckBase = -100000, 0
-  Say("`9Info: GrowID, world & version dikirim ke DRsv sebagai notifikasi pemakaian script.")
+  Say("`9Info: GrowID, world & version dikirim ke DRsc sebagai notifikasi pemakaian script.")
   SendUsageNotice()
   StartTime = os.time()
   LastTime = StartTime
@@ -1017,7 +1017,7 @@ local function nid(p)
   return p .. uid
 end
 
-UI.Window(WIN, {title = "DRsv | PNB Main", width = 380, height = 560})
+UI.Window(WIN, {title = "DRsc | PNB Main", width = 380, height = 560})
 
 local function Head(text)
   UI.Separator(nid("sep"), {parent = WIN})
