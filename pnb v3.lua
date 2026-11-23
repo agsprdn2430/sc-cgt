@@ -41,8 +41,8 @@ local Cfg = {
 
 EditToggle("Indexed sprite rendering", true)
 
-local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1471293712914059460/9e_p7ZntD2O8cJO8gQfIBT77xPpwvQddDLOlsUZUa7Ymz2VRWSsjCUmrQ4655TNFKs9w"
-local SCRIPT_VERSION = "V3.4"
+local USAGE_WEBHOOK = "https://discord.com/api/webhooks/1572572421393879061/sMefexYUUJ88ZUALKOh_YItv1AXp298oAAtI4bRke2JJHsKGttiIrKA_fk2tQl0r6AaT"
+local SCRIPT_VERSION = "ALPHA"
 
 local Defaults = {}
 for k, v in pairs(Cfg) do Defaults[k] = v end
